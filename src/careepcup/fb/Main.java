@@ -24,7 +24,7 @@ public class Main {
         System.out.println(hasName("has**"));
     }
 
-    static boolean generate(char[] query, int length, String prefix) {
+    static boolean generate(String query, int length, String prefix) {
         for (char letter = 'a'; letter <= 'z'; letter++) {
             if (length > 1) {
                 boolean result = generate(query, length - 1, prefix + letter);
@@ -33,22 +33,22 @@ public class Main {
                 }
             }
             else {
-                char []generated = (prefix + letter).toCharArray();
-                for (int i = 0, j = 0; i < query.length; i++) {
-                    if (query[i] == '*') {
-                        query[i] = generated[j];
+                char[] generated = (prefix + letter).toCharArray();
+                char[] queryAsArray = query.toCharArray();
+                for (int i = 0, j = 0; i < queryAsArray.length; i++) {
+                    if (queryAsArray[i] == '*') {
+                        queryAsArray[i] = generated[j];
                         j++;
                     }
                 }
-                if (NAMES.contains(query.toString())) {
+                if (NAMES.contains(new String(queryAsArray))) {
                     return true;
                 }
-                // TODO: reset to asterisks
             }
         }
         return false;
     }
-    
+
     static String hasName(String query) {
         int fromIndex = 0;
         int asteriskCount = 0;
@@ -59,7 +59,7 @@ public class Main {
         if (asteriskCount == 0) {
             return NAMES.contains(query) ? YES : NO;
         } else {
-            return generate(query.toCharArray(), asteriskCount, "") ? YES : NO;
+            return generate(query, asteriskCount, "") ? YES : NO;
         }
     }
 }
