@@ -6,6 +6,9 @@ import java.util.Set;
 public class Main {
 
     /*
+     * http://www.careercup.com/question?id=5669407776833536
+     * http://codereview.stackexchange.com/questions/82848/a-set-of-names-and-a-request-with-asterisks
+     *
      * This class offers constant time performance for the basic operations (add, remove, contains
      * and size), assuming the hash function disperses the elements properly among the buckets.
      */
@@ -21,45 +24,31 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println(hasName("has**"));
-    }
-
-    static boolean generate(String query, int length, String prefix) {
-        for (char letter = 'a'; letter <= 'z'; letter++) {
-            if (length > 1) {
-                boolean result = generate(query, length - 1, prefix + letter);
-                if (result) {
-                    return true;
-                }
-            }
-            else {
-                char[] generated = (prefix + letter).toCharArray();
-                char[] queryAsArray = query.toCharArray();
-                for (int i = 0, j = 0; i < queryAsArray.length; i++) {
-                    if (queryAsArray[i] == '*') {
-                        queryAsArray[i] = generated[j];
-                        j++;
-                    }
-                }
-                if (NAMES.contains(new String(queryAsArray))) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        System.out.println(hasName("f*z*"));
     }
 
     static String hasName(String query) {
-        int fromIndex = 0;
-        int asteriskCount = 0;
-        while ((fromIndex = query.indexOf("*", fromIndex)) != -1) {
-            asteriskCount++;
-            fromIndex++;
+        generateNames();
+        return NAMES.contains(query) ? YES : NO;
+    }
+
+    static void generateNames() {
+        Set<String> generatedNames = new HashSet<String>();
+        for (String name : NAMES) {
+            int limit = (int) Math.pow(2, name.length());
+            for (int i = 1; i < limit; i++) {
+                String binary = Integer.toBinaryString(i);
+                int k = 0;
+                char nameAsArray[] = name.toCharArray();
+                for (int j = binary.length() - 1; j >= 0; j--) {
+                    if (binary.charAt(j) == '1') {
+                        nameAsArray[k] = '*';
+                    }
+                    k++;
+                }
+                generatedNames.add(new String(nameAsArray));
+            }
         }
-        if (asteriskCount == 0) {
-            return NAMES.contains(query) ? YES : NO;
-        } else {
-            return generate(query, asteriskCount, "") ? YES : NO;
-        }
+        NAMES.addAll(generatedNames);
     }
 }
